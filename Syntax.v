@@ -3,7 +3,7 @@ From LF Require Export Array.
 
 Inductive expr : Type := 
 | const (n : nat) : expr
-| incr (A : array) (index : nat) : expr
+| incr (index : nat) : expr
 .
 
 Inductive sequence (X : Type) : Type :=
@@ -15,8 +15,8 @@ Arguments seq {X} _ _.
 
 Inductive instr : Type :=
 | skp : instr  (* Handled in statement so unnecessary *)
-| assignment (A : array) (index : nat) (e : expr) : instr
-| while (A : array) (index : nat) (s : sequence instr) : instr
+| assignment (index : nat) (e : expr) : instr
+| while (index : nat) (s : sequence instr) : instr
 | async (s : sequence instr) : instr
 | finish (s : sequence instr) : instr
 | call (s : sequence instr) : instr
@@ -51,5 +51,5 @@ Check p ({skp}).
 Check p ({skp; skp}).
 Check p ({skp; skp; async {skp}}).
 Check p ({skp; skp; finish {async {skp}}}).
-Check p ({finish {async {skp}}; while [1] 0 {assignment [5] 0 (const 1)}}).
-Check p ({call {skp; call {skp; assignment [3; 5] 1 (incr [2] 0)}; skp; call {skp}}}).
+Check p ({finish {async {skp}}; while 0 {assignment 0 (const 1)}}).
+Check p ({call {skp; call {skp; assignment 1 (incr 0)}; skp; call {skp}}}).

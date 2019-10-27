@@ -62,20 +62,20 @@ Inductive stepsto : State -> State -> Prop :=
       (state p A (statements k))
 | stepsto_9 (p : program) (A : array) (k : statement) (d : nat) (e : expr):
     stepsto 
-      (state p A (statements (seq (assignment A d e) k))) 
+      (state p A (statements (seq (assignment d e) k))) 
       (
         match e with 
         | const n => (state p (assign A d n) (statements k))
-        | incr a i => (state p (assign A d (access A i)) (statements k))
+        | incr i => (state p (assign A d ((access A i) + 1)) (statements k))
         end
       )
 | stepsto_10_11 (p : program) (A : array) (k : statement) (d : nat) (s : statement):
     stepsto 
-      (state p A (statements (seq (while A d s) k))) 
+      (state p A (statements (seq (while d s) k))) 
       (
         match (access A d) with 
         | O => (state p A (statements k))
-        | S n => (state p A (statements (join s (seq (while A d s) k))))
+        | S n => (state p A (statements (join s (seq (while d s) k))))
         end
       )
 | stepsto_12 (p : program) (A : array) (k : statement) (s : statement):
