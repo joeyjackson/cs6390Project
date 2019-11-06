@@ -98,14 +98,14 @@ Example test_stepsto1:
     (state (p {}) (array_init 0) (statements {skp})).
 Proof. apply stepsto_1. Qed.
 
-(* TODO Example test_stepsto2: *)
 Example test_stepsto2:
     stepsto
-      (state (p {}) (array_init 0) (done :> (statements {skp})))
-      (state (p {}) (array_init 1) (statements {skp}))  ->
+      (state (p {}) [0] (statements {(assignment 0 (const 1)); skp}))
+      (state (p {}) [1] (statements {skp}))
+    ->
     stepsto
-      (state (p {}) (array_init 0) ((done :> (statements {skp})):> (statements {assignment 0 (const 1)})))
-      (state (p {}) (array_init 1) ((statements {skp}) :> (statements {assignment 0 (const 1)}))).
+      (state (p {}) [0] ((statements {(assignment 0 (const 1)); skp}) :> (statements {skp})))
+      (state (p {}) [1] ((statements {skp}) :> (statements {skp}))).
 Proof. apply stepsto_2. Qed.
 
 Example test_stepsto3:
@@ -120,26 +120,24 @@ Example test_stepsto4:
     (state (p {}) (array_init 0) (statements {skp})).
 Proof. apply stepsto_4. Qed.
 
-
 Example test_stepsto5:
     stepsto
-      (state (p {}) (array_init 0) (done :> (statements {skp})))
-      (state (p {}) (array_init 0) (done :> (statements {skp})))
+      (state (p {}) [0] (statements {(assignment 0 (const 1)); skp}))
+      (state (p {}) [1] (statements {skp}))
     ->
     stepsto
-      (state (p {}) (array_init 0) ((done :> (statements {skp})) || (statements {assignment 0 (const 1)})))
-      (state (p {}) (array_init 0) ((done :> (statements {skp})) || (statements {assignment 0 (const 1)}))).
+      (state (p {}) [0] ((statements {(assignment 0 (const 1)); skp}) || (statements {skp})))
+      (state (p {}) [1] ((statements {skp}) || (statements {skp}))).
 Proof. apply stepsto_5. Qed.
 
-Definition a0 := state (p {}) (array_init 0).
 Example test_stepsto6:
     stepsto
-      (state (p {}) (array_init 0) (done :> (statements {skp})))
-      (state (p {}) (array_init 0) (done :> (statements {skp})))
+      (state (p {}) [0] (statements {(assignment 0 (const 1)); skp}))
+      (state (p {}) [1] (statements {skp}))
     ->
     stepsto
-      (state (p {}) (array_init 0) ((statements {assignment 0 (const 1)}) || (done :> (statements {skp}))))
-      (state (p {}) (array_init 0) ((statements {assignment 0 (const 1)}) || (done :> (statements {skp})))).
+      (state (p {}) [0] ((statements {skp}) || (statements {(assignment 0 (const 1)); skp})))
+      (state (p {}) [1] ((statements {skp}) || (statements {skp}))).
 Proof. apply stepsto_6. Qed.
 
 Example test_stepsto7:
@@ -150,46 +148,50 @@ Proof. apply stepsto_7. Qed.
 
 Example test_stepsto8:
   stepsto
-    (state (p {}) (array_init 0) (statements (seq skp (seq (assignment 0 (const 1)) skip) ) ) )
-    (state (p {}) (array_init 0) (statements (seq (assignment 0 (const 1)) skip) ) ).
+    (state (p {}) (array_init 0) (statements {skp; (assignment 0 (const 1))}))
+    (state (p {}) (array_init 0) (statements {assignment 0 (const 1)})).
 Proof. apply stepsto_8. Qed.
 
-Example test_stepsto9:
+Example test_stepsto9A:
   stepsto
-    (state (p {}) (array_init 1) (statements (seq (assignment 0 (const 1)) skip)))
-    (state (p {}) ([1]) (statements skip)).
+    (state (p {}) [1] (statements {assignment 0 (const 2)}))
+    (state (p {}) [2] (statements skip)).
 Proof. apply stepsto_9. Qed.
 
-(* TODO Example test_stepsto10: *)
-(* TODO Example test_stepsto11: *)
-Example test_stepsto10_11:
+Example test_stepsto9B:
+  stepsto
+    (state (p {}) [0; 1] (statements {assignment 1 (incr 1)}))
+    (state (p {}) [0; 2] (statements skip)).
+Proof. apply stepsto_9. Qed.
+
+Example test_stepsto10:
     stepsto
-      (a0 (statements (seq (while 0 skip) skip)))
-      (
-        match (access (array_init 0) 0) with
-        | O => (state (p {}) (array_init 0) (statements skip))
-        | S n => (state (p {}) (array_init 0) (statements (join skip (seq (while 0 skip) skip))))
-        end
-      ).
+      (state (p {}) [0; 1] (statements {while 0 {skp}}))
+      (state (p {}) [0; 1] (statements skip)).
 Proof. apply stepsto_10_11. Qed.
 
+Example test_stepsto11:
+    stepsto
+      (state (p {}) [0; 1] (statements {(while 1 {skp})}))
+      (state (p {}) [0; 1] (statements {skp; (while 1 {skp})})).
+Proof. apply stepsto_10_11. Qed.
 
 Example test_stepsto12:
   stepsto
-    (state (p {}) (array_init 0) (statements (seq (async skip) skip)))
-    (state (p {}) (array_init 0) ((statements skip) || (statements skip))).
+    (state (p {}) (array_init 0) (statements {(async skip); skp}))
+    (state (p {}) (array_init 0) ((statements skip) || (statements {skp}))).
 Proof. apply stepsto_12. Qed.
 
 Example test_stepsto13:
   stepsto
-    (state (p {}) (array_init 0) (statements (seq (finish skip) skip)))
-    (state (p {}) (array_init 0) ((statements skip) :> (statements skip))).
+    (state (p {}) (array_init 0) (statements {(finish skip); skp}))
+    (state (p {}) (array_init 0) ((statements skip) :> (statements {skp}))).
 Proof. apply stepsto_13. Qed.
 
 Example test_stepsto14:
   stepsto
-    (a0 (statements (seq (call skip) skip)))
-    (a0 (statements (join skip skip))).
+    (state (p {}) (array_init 1) (statements {call {assignment 0 (const 1)}; skp}))
+    (state (p {}) (array_init 1) (statements {assignment 0 (const 1); skp})).
 Proof. apply stepsto_14. Qed.
 
 
