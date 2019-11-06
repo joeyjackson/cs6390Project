@@ -27,19 +27,19 @@ Proof.
       right. exists A. exists done. constructor.
       induction x. right.
       exists A. exists (statements s).
-                 try constructor.
-                 right. destruct e. exists (assign A index n). exists (statements s). constructor.
-                 exists (assign A index ((access A index0) + 1)). exists (statements s).
-                 constructor.
-                 right. exists A. exists (
-        match (access A index) with 
-        | O => (statements s)
-        | S n => (statements (join s0 (seq (while index s0) s)))
-        end). constructor.
-
-                 right. exists A. exists ((statements s0) || (statements s)). constructor.
-                 right. exists A. exists ((statements s0) :> (statements s)). constructor.
-                 right. exists A. exists (statements (join s0 s)). constructor.
+      try constructor.
+      right. destruct e. exists (assign A index n). exists (statements s). constructor.
+      exists (assign A index ((access A index0) + 1)). exists (statements s).
+      constructor.
+      right. exists A. exists (
+                           match (access A index) with 
+                           | O => (statements s)
+                           | S n => (statements (join s0 (seq (while index s0) s)))
+                           end). constructor.
+      
+      right. exists A. exists ((statements s0) || (statements s)). constructor.
+      right. exists A. exists ((statements s0) :> (statements s)). constructor.
+      right. exists A. exists (statements (join s0 s)). constructor.
       
     }
   - {
@@ -59,11 +59,8 @@ Proof.
       exists x. exists (x0 || T2). apply stepsto_5. apply H.
       simpl. induction IHT1. inversion H. destruct H as [x]. destruct H as [x0]. right.
       exists x. exists (x0 || T2). apply stepsto_5. apply H.
-simpl. induction IHT1. inversion H. destruct H as [x]. destruct H as [x0]. right.
+      simpl. induction IHT1. inversion H. destruct H as [x]. destruct H as [x0]. right.
       exists x. exists (x0 || T2). apply stepsto_5. apply H.
-
+      
     }
-
-    
-    
 Qed.
