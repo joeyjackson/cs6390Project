@@ -72,10 +72,10 @@ Inductive stepsto : State -> State -> Prop :=
 | stepsto_10_11 (p : program) (A : array) (k : statement) (d : nat) (s : statement):
     stepsto
       (state p A (statements (seq (while d s) k)))
-      (
+      (state p A
         match (access A d) with
-        | O => (state p A (statements k))
-        | S n => (state p A (statements (join s (seq (while d s) k))))
+        | O => (statements k)
+        | S n => (statements (join s (seq (while d s) k)))
         end
       )
 | stepsto_12 (p : program) (A : array) (k : statement) (s : statement):
